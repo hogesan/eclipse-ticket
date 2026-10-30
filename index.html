@@ -122,10 +122,24 @@
             filter: grayscale(1) brightness(0.5);
             opacity: 0.6;
         }
-        /* チケット画像の位置 */
+        /* 【重要】チケットを完全に封筒のサイズの中に収めるクリッピングコンテナ */
+        .ticket-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* はみ出た白い余白をここで完全に切り取る */
+            z-index: 1;
+            transition: overflow 0s ease 0.1s; /* 開く瞬間にクリップを解除 */
+        }
+        .envelope-wrapper.open .ticket-container {
+            overflow: visible; /* 開いた時は外に出られるようにする */
+        }
+        /* チケット画像自体の初期位置をさらに上（封筒の中央）へ引き上げる */
         .ticket {
             position: absolute;
-            top: 25px; 
+            top: -20px; /* 大幅に上に引き上げて封筒に完全に隠す */
             left: 50%;
             transform: translateX(-50%) translateY(0) scale(0.65); 
             width: 320px;
@@ -133,9 +147,8 @@
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.7);
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-            z-index: 1;
         }
-        /* 【開いた状態】 */
+        /* 【開いた状態：はみ出しを無視して中央へ大ジャンプ】 */
         .envelope-wrapper.open .flap {
             transform: rotateX(180deg);
             z-index: 1;
@@ -145,7 +158,8 @@
             opacity: 0;
         }
         .envelope-wrapper.open .ticket {
-            transform: translateX(-50%) translateY(-390px) scale(1.35);
+            /* 白い余白を考慮した飛び出し位置（マイナス値を強めに設定） */
+            transform: translateX(-50%) translateY(-370px) scale(1.35);
             z-index: 15;
         }
         /* 下部の案内テキスト */
@@ -164,7 +178,7 @@
             50% { opacity: 1; }
             100% { opacity: 0.4; }
         }
-        /* キラキラ（星）のスタイル */
+        /* キラキラのスタイル */
         .sparkle {
             position: absolute;
             background: radial-gradient(circle, #fff 0%, rgba(255,220,120,0.8) 40%, transparent 100%);
@@ -190,7 +204,6 @@
 </head>
 <body>
 
-    <!-- 幻想的な魔法のフリー音源を自動ロード -->
     <audio id="openSound" src="https://mixkit.co" preload="auto"></audio>
 
     <div class="envelope-wrapper" id="envelopeWrapper">
@@ -199,7 +212,10 @@
         <div class="envelope"></div>
         <div class="pocket"></div>
         
-        <img src="ticket.jpg" alt="Eclipse 特別記念チケット" class="ticket">
+        <!-- チケットを閉じ込める新しい枠組みを追加 -->
+        <div class="ticket-container">
+            <img src="ticket.jpg" alt="Eclipse 特別記念チケット" class="ticket">
+        </div>
         
         <div class="hint" id="hintText">封筒の刻印をタップしてチケットを授かる</div>
     </div>
@@ -217,12 +233,10 @@
                 hint.style.animation = "none";
                 hint.style.color = "#fff";
                 
-                // 音声を再生（タップ操作と連動しているのでスマホでも鳴ります）
                 sound.currentTime = 0;
                 sound.volume = 0.5;
                 sound.play().catch(err => console.log("Audio play blocked"));
 
-                // 星空キラキラエフェクトを大量生成
                 createSparkles(50);
             } else {
                 hint.textContent = "封筒の刻印をタップしてチケットを授かる";
@@ -231,25 +245,21 @@
             }
         });
 
-        // キラキラ粒子をランダムに飛び散らせる関数
         function createSparkles(num) {
             for (let i = 0; i < num; i++) {
                 const sparkle = document.createElement('div');
                 sparkle.className = 'sparkle';
                 
-                // 画面中央（封筒の位置）をスタート地点にする
                 const startX = window.innerWidth / 2;
                 const startY = window.innerHeight / 2 + 50;
                 
                 sparkle.style.left = startX + 'px';
                 sparkle.style.top = startY + 'px';
                 
-                // 大きさをランダムに設定
                 const size = Math.random() * 8 + 4;
                 sparkle.style.width = size + 'px';
                 sparkle.style.height = size + 'px';
                 
-                // 飛び散る軌道をランダムに計算（星空のように四方八方へ）
                 const angle = Math.random() * Math.PI * 2;
                 const distance1 = Math.random() * 100 + 50;
                 const distance2 = Math.random() * 300 + 150;
@@ -257,19 +267,17 @@
                 const mx = Math.cos(angle) * distance1;
                 const my = Math.sin(angle) * distance1;
                 const tx = Math.cos(angle) * distance2;
-                const ty = Math.sin(angle) * distance2 - 100; // やや上に向かって流れるように
+                const ty = Math.sin(angle) * distance2 - 100;
                 
                 sparkle.style.setProperty('--mx', `${mx}px`);
                 sparkle.style.setProperty('--my', `${my}px`);
                 sparkle.style.setProperty('--tx', `${tx}px`);
                 sparkle.style.setProperty('--ty', `${ty}px`);
                 
-                // アニメーション時間をランダムにして星の瞬きを表現
                 sparkle.style.animationDuration = (Math.random() * 1.5 + 1.0) + 's';
                 
                 document.body.appendChild(sparkle);
                 
-                // アニメーションが終わったら消去
                 setTimeout(() => {
                     sparkle.remove();
                 }, 2500);

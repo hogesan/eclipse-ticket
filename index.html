@@ -21,15 +21,15 @@
             font-family: 'Georgia', serif;
             position: relative;
         }
-        /* 封筒全体のコンテナ */
+        /* 封筒全体のコンテナ（縦幅を380pxに長く変更） */
         .envelope-wrapper {
             position: relative;
             width: 360px;
-            height: 250px;
+            height: 380px; 
             cursor: pointer;
             perspective: 1200px;
             transition: transform 0.3s ease;
-            margin-top: 180px; 
+            margin-top: 100px; 
             z-index: 10;
         }
         .envelope-wrapper:hover {
@@ -42,8 +42,8 @@
             height: 100%;
             background-color: #140e21;
             border: 2px solid #bfa15f; 
-            border-radius: 4px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            border-radius: 6px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
             z-index: 2;
             overflow: hidden;
         }
@@ -54,14 +54,14 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, transparent 40%, rgba(191, 161, 95, 0.05) 70%);
-            border: 1px dashed rgba(191, 161, 95, 0.1);
-            animation: rotateMagic 20s linear infinite;
+            background: radial-gradient(circle, transparent 40%, rgba(191, 161, 95, 0.04) 70%);
+            border: 1px dashed rgba(191, 161, 95, 0.08);
+            animation: rotateMagic 25s linear infinite;
         }
         @keyframes rotateMagic {
             100% { transform: rotate(360deg); }
         }
-        /* 封筒のフタ（あけ口） */
+        /* 封筒のフタ（長さに合わせて調整） */
         .flap {
             position: absolute;
             top: 0;
@@ -70,24 +70,24 @@
             height: 0;
             border-left: 180px solid transparent;
             border-right: 180px solid transparent;
-            border-top: 130px solid #1c142e;
+            border-top: 180px solid #1c142e;
             transform-origin: top;
-            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 5;
-            filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.6));
         }
         .flap::after {
             content: '';
             position: absolute;
-            top: -130px;
+            top: -180px;
             left: -180px;
             width: 0;
             height: 0;
             border-left: 180px solid transparent;
             border-right: 180px solid transparent;
-            border-top: 126px solid #140e21;
+            border-top: 176px solid #140e21;
         }
-        /* 前面ポケット */
+        /* 前面ポケット（深さを調整） */
         .pocket {
             position: absolute;
             bottom: 0;
@@ -96,22 +96,22 @@
             height: 0;
             border-left: 180px solid transparent;
             border-right: 180px solid transparent;
-            border-bottom: 140px solid #181129;
+            border-bottom: 220px solid #181129;
             z-index: 4;
-            filter: drop-shadow(0 -2px 5px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 -3px 8px rgba(0,0,0,0.4));
         }
-        /* シーリングスタンプ */
+        /* シーリングスタンプ（中央付近に配置） */
         .stamp {
             position: absolute;
-            top: 110px;
+            top: 155px;
             left: 155px;
             width: 50px;
             height: 50px;
             background: radial-gradient(circle, #a62424 0%, #731313 100%);
             border-radius: 50%;
             z-index: 6;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2);
-            transition: opacity 0.3s ease, transform 0.5s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6), inset 0 2px 4px rgba(255,255,255,0.2);
+            transition: opacity 0.3s ease, transform 0.6s ease;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -122,33 +122,33 @@
             filter: grayscale(1) brightness(0.5);
             opacity: 0.6;
         }
-        /* 【重要】チケットを完全に封筒のサイズの中に収めるクリッピングコンテナ */
+        /* チケットのコンテナ（サイズを長く変更してはみ出しを完全に切り取り） */
         .ticket-container {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            overflow: hidden; /* はみ出た白い余白をここで完全に切り取る */
+            height: 370px; 
+            overflow: hidden; 
             z-index: 1;
-            transition: overflow 0s ease 0.1s; /* 開く瞬間にクリップを解除 */
+            transition: overflow 0s ease 0.1s;
         }
         .envelope-wrapper.open .ticket-container {
-            overflow: visible; /* 開いた時は外に出られるようにする */
+            overflow: visible; 
         }
-        /* チケット画像自体の初期位置をさらに上（封筒の中央）へ引き上げる */
+        /* チケット画像の位置（長い封筒の内部にすっぽり隠す） */
         .ticket {
             position: absolute;
-            top: -20px; /* 大幅に上に引き上げて封筒に完全に隠す */
+            top: 10px; 
             left: 50%;
-            transform: translateX(-50%) translateY(0) scale(0.65); 
+            transform: translateX(-50%) translateY(0) scale(0.85); 
             width: 320px;
             height: auto;
             border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.7);
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
         }
-        /* 【開いた状態：はみ出しを無視して中央へ大ジャンプ】 */
+        /* 【開いた状態：上に向かって美しく飛び出す】 */
         .envelope-wrapper.open .flap {
             transform: rotateX(180deg);
             z-index: 1;
@@ -158,20 +158,20 @@
             opacity: 0;
         }
         .envelope-wrapper.open .ticket {
-            /* 白い余白を考慮した飛び出し位置（マイナス値を強めに設定） */
-            transform: translateX(-50%) translateY(-370px) scale(1.35);
+            transform: translateX(-50%) translateY(-280px) scale(1.15);
             z-index: 15;
         }
-        /* 下部の案内テキスト */
+        /* 下部の案内テキスト（位置をさらに下に下げて配置） */
         .hint {
             position: absolute;
-            bottom: -60px;
+            bottom: -90px; 
             width: 100%;
             text-align: center;
             color: #bfa15f;
             font-size: 13px;
             letter-spacing: 0.15em;
             animation: pulse 2s infinite;
+            line-height: 1.6;
         }
         @keyframes pulse {
             0% { opacity: 0.4; }
@@ -181,7 +181,7 @@
         /* キラキラのスタイル */
         .sparkle {
             position: absolute;
-            background: radial-gradient(circle, #fff 0%, rgba(255,220,120,0.8) 40%, transparent 100%);
+            background: radial-gradient(circle, #fff 0%, rgba(255,220,120,0.9) 40%, transparent 100%);
             border-radius: 50%;
             pointer-events: none;
             z-index: 99;
@@ -192,8 +192,8 @@
                 transform: translate(0, 0) scale(0);
                 opacity: 1;
             }
-            10% {
-                transform: translate(var(--mx), var(--my)) scale(1);
+            15% {
+                transform: translate(var(--mx), var(--my)) scale(1.2);
             }
             100% {
                 transform: translate(var(--tx), var(--ty)) scale(0);
@@ -204,15 +204,12 @@
 </head>
 <body>
 
-    <audio id="openSound" src="https://mixkit.co" preload="auto"></audio>
-
     <div class="envelope-wrapper" id="envelopeWrapper">
         <div class="flap"></div>
         <div class="stamp"></div>
         <div class="envelope"></div>
         <div class="pocket"></div>
         
-        <!-- チケットを閉じ込める新しい枠組みを追加 -->
         <div class="ticket-container">
             <img src="ticket.jpg" alt="Eclipse 特別記念チケット" class="ticket">
         </div>
@@ -223,7 +220,40 @@
     <script>
         const wrapper = document.getElementById('envelopeWrapper');
         const hint = document.getElementById('hintText');
-        const sound = document.getElementById('openSound');
+
+        // プログラム内部で直接「シャララン✨」という音を合成して再生する関数（ブラウザ制限を回避）
+        function playChimeSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                const ctx = new AudioContext();
+                
+                const now = ctx.currentTime;
+                // 4つの高音をずらして鳴らすことで、美しいチャイム音を表現
+                const notes = [523.25, 659.25, 783.99, 1046.50]; 
+                
+                notes.forEach((freq, index) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    
+                    // 音の立ち上がりと消え方の調整
+                    const startTime = now + (index * 0.08);
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.6);
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.6);
+                });
+            } catch(e) {
+                console.log("Audio Error:", e);
+            }
+        }
 
         wrapper.addEventListener('click', (e) => {
             wrapper.classList.toggle('open');
@@ -233,11 +263,11 @@
                 hint.style.animation = "none";
                 hint.style.color = "#fff";
                 
-                sound.currentTime = 0;
-                sound.volume = 0.5;
-                sound.play().catch(err => console.log("Audio play blocked"));
+                // 音を鳴らす
+                playChimeSound();
 
-                createSparkles(50);
+                // キラキラ粒子を生成
+                createSparkles(60);
             } else {
                 hint.textContent = "封筒の刻印をタップしてチケットを授かる";
                 hint.style.animation = "pulse 2s infinite";
@@ -251,38 +281,18 @@
                 sparkle.className = 'sparkle';
                 
                 const startX = window.innerWidth / 2;
-                const startY = window.innerHeight / 2 + 50;
+                const startY = window.innerHeight / 2;
                 
                 sparkle.style.left = startX + 'px';
                 sparkle.style.top = startY + 'px';
                 
-                const size = Math.random() * 8 + 4;
+                const size = Math.random() * 10 + 4;
                 sparkle.style.width = size + 'px';
                 sparkle.style.height = size + 'px';
                 
                 const angle = Math.random() * Math.PI * 2;
-                const distance1 = Math.random() * 100 + 50;
-                const distance2 = Math.random() * 300 + 150;
+                const distance1 = Math.random() * 120 + 60;
+                const distance2 = Math.random() * 350 + 200;
                 
                 const mx = Math.cos(angle) * distance1;
                 const my = Math.sin(angle) * distance1;
-                const tx = Math.cos(angle) * distance2;
-                const ty = Math.sin(angle) * distance2 - 100;
-                
-                sparkle.style.setProperty('--mx', `${mx}px`);
-                sparkle.style.setProperty('--my', `${my}px`);
-                sparkle.style.setProperty('--tx', `${tx}px`);
-                sparkle.style.setProperty('--ty', `${ty}px`);
-                
-                sparkle.style.animationDuration = (Math.random() * 1.5 + 1.0) + 's';
-                
-                document.body.appendChild(sparkle);
-                
-                setTimeout(() => {
-                    sparkle.remove();
-                }, 2500);
-            }
-        }
-    </script>
-</body>
-</html>

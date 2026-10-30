@@ -19,8 +19,9 @@
             min-height: 100vh;
             overflow: hidden;
             font-family: 'Georgia', serif;
+            position: relative;
         }
-        /* 封筒全体のコンテナ（位置を少し下に調整して飛び出すスペースを確保） */
+        /* 封筒全体のコンテナ */
         .envelope-wrapper {
             position: relative;
             width: 360px;
@@ -28,7 +29,8 @@
             cursor: pointer;
             perspective: 1200px;
             transition: transform 0.3s ease;
-            margin-top: 150px; /* 上に飛び出すための余白 */
+            margin-top: 180px; 
+            z-index: 10;
         }
         .envelope-wrapper:hover {
             transform: translateY(-8px);
@@ -59,7 +61,7 @@
         @keyframes rotateMagic {
             100% { transform: rotate(360deg); }
         }
-        /* 封筒のフタ */
+        /* 封筒のフタ（あけ口） */
         .flap {
             position: absolute;
             top: 0;
@@ -120,12 +122,12 @@
             filter: grayscale(1) brightness(0.5);
             opacity: 0.6;
         }
-        /* チケット画像の位置調整（画像自体の白い余白を考慮して、封筒の内部へ隠す） */
+        /* チケット画像の位置 */
         .ticket {
             position: absolute;
-            top: -50px; /* スタート位置を上に微調整 */
+            top: 25px; 
             left: 50%;
-            transform: translateX(-50%) translateY(0) scale(0.6); /* 初期サイズを封筒に収まるよう縮小 */
+            transform: translateX(-50%) translateY(0) scale(0.65); 
             width: 320px;
             height: auto;
             border-radius: 8px;
@@ -133,7 +135,7 @@
             transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
             z-index: 1;
         }
-        /* 【開いた状態：上に向かってスッと飛び出すエフェクト】 */
+        /* 【開いた状態】 */
         .envelope-wrapper.open .flap {
             transform: rotateX(180deg);
             z-index: 1;
@@ -143,9 +145,8 @@
             opacity: 0;
         }
         .envelope-wrapper.open .ticket {
-            /* マイナスの方向に大きく移動させ、画面中央で拡大表示させます */
-            transform: translateX(-50%) translateY(-380px) scale(1.3);
-            z-index: 10;
+            transform: translateX(-50%) translateY(-390px) scale(1.35);
+            z-index: 15;
         }
         /* 下部の案内テキスト */
         .hint {
@@ -163,9 +164,34 @@
             50% { opacity: 1; }
             100% { opacity: 0.4; }
         }
+        /* キラキラ（星）のスタイル */
+        .sparkle {
+            position: absolute;
+            background: radial-gradient(circle, #fff 0%, rgba(255,220,120,0.8) 40%, transparent 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99;
+            animation: fly linear forwards;
+        }
+        @keyframes fly {
+            0% {
+                transform: translate(0, 0) scale(0);
+                opacity: 1;
+            }
+            10% {
+                transform: translate(var(--mx), var(--my)) scale(1);
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- 幻想的な魔法のフリー音源を自動ロード -->
+    <audio id="openSound" src="https://mixkit.co" preload="auto"></audio>
 
     <div class="envelope-wrapper" id="envelopeWrapper">
         <div class="flap"></div>
@@ -181,19 +207,74 @@
     <script>
         const wrapper = document.getElementById('envelopeWrapper');
         const hint = document.getElementById('hintText');
+        const sound = document.getElementById('openSound');
 
-        wrapper.addEventListener('click', () => {
+        wrapper.addEventListener('click', (e) => {
             wrapper.classList.toggle('open');
+            
             if(wrapper.classList.contains('open')) {
                 hint.textContent = "旅人よ、世界の再生を見届けてくれてありがとう";
                 hint.style.animation = "none";
                 hint.style.color = "#fff";
+                
+                // 音声を再生（タップ操作と連動しているのでスマホでも鳴ります）
+                sound.currentTime = 0;
+                sound.volume = 0.5;
+                sound.play().catch(err => console.log("Audio play blocked"));
+
+                // 星空キラキラエフェクトを大量生成
+                createSparkles(50);
             } else {
                 hint.textContent = "封筒の刻印をタップしてチケットを授かる";
                 hint.style.animation = "pulse 2s infinite";
                 hint.style.color = "#bfa15f";
             }
         });
+
+        // キラキラ粒子をランダムに飛び散らせる関数
+        function createSparkles(num) {
+            for (let i = 0; i < num; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                
+                // 画面中央（封筒の位置）をスタート地点にする
+                const startX = window.innerWidth / 2;
+                const startY = window.innerHeight / 2 + 50;
+                
+                sparkle.style.left = startX + 'px';
+                sparkle.style.top = startY + 'px';
+                
+                // 大きさをランダムに設定
+                const size = Math.random() * 8 + 4;
+                sparkle.style.width = size + 'px';
+                sparkle.style.height = size + 'px';
+                
+                // 飛び散る軌道をランダムに計算（星空のように四方八方へ）
+                const angle = Math.random() * Math.PI * 2;
+                const distance1 = Math.random() * 100 + 50;
+                const distance2 = Math.random() * 300 + 150;
+                
+                const mx = Math.cos(angle) * distance1;
+                const my = Math.sin(angle) * distance1;
+                const tx = Math.cos(angle) * distance2;
+                const ty = Math.sin(angle) * distance2 - 100; // やや上に向かって流れるように
+                
+                sparkle.style.setProperty('--mx', `${mx}px`);
+                sparkle.style.setProperty('--my', `${my}px`);
+                sparkle.style.setProperty('--tx', `${tx}px`);
+                sparkle.style.setProperty('--ty', `${ty}px`);
+                
+                // アニメーション時間をランダムにして星の瞬きを表現
+                sparkle.style.animationDuration = (Math.random() * 1.5 + 1.0) + 's';
+                
+                document.body.appendChild(sparkle);
+                
+                // アニメーションが終わったら消去
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 2500);
+            }
+        }
     </script>
 </body>
 </html>

@@ -21,7 +21,7 @@
             font-family: 'Georgia', serif;
             position: relative;
         }
-        /* 封筒全体のコンテナ（縦幅を380pxに長く変更） */
+        /* 封筒全体のコンテナ */
         .envelope-wrapper {
             position: relative;
             width: 360px;
@@ -31,6 +31,7 @@
             transition: transform 0.3s ease;
             margin-top: 100px; 
             z-index: 10;
+            -webkit-tap-highlight-color: transparent;
         }
         .envelope-wrapper:hover {
             transform: translateY(-8px);
@@ -61,7 +62,7 @@
         @keyframes rotateMagic {
             100% { transform: rotate(360deg); }
         }
-        /* 封筒のフタ（長さに合わせて調整） */
+        /* 封筒のフタ */
         .flap {
             position: absolute;
             top: 0;
@@ -87,7 +88,7 @@
             border-right: 180px solid transparent;
             border-top: 176px solid #140e21;
         }
-        /* 前面ポケット（深さを調整） */
+        /* 前面ポケット */
         .pocket {
             position: absolute;
             bottom: 0;
@@ -100,7 +101,7 @@
             z-index: 4;
             filter: drop-shadow(0 -3px 8px rgba(0,0,0,0.4));
         }
-        /* シーリングスタンプ（中央付近に配置） */
+        /* シーリングスタンプ */
         .stamp {
             position: absolute;
             top: 155px;
@@ -122,7 +123,7 @@
             filter: grayscale(1) brightness(0.5);
             opacity: 0.6;
         }
-        /* チケットのコンテナ（サイズを長く変更してはみ出しを完全に切り取り） */
+        /* チケットのコンテナ（はみ出しを確実にカット） */
         .ticket-container {
             position: absolute;
             top: 0;
@@ -136,7 +137,7 @@
         .envelope-wrapper.open .ticket-container {
             overflow: visible; 
         }
-        /* チケット画像の位置（長い封筒の内部にすっぽり隠す） */
+        /* チケット画像の位置 */
         .ticket {
             position: absolute;
             top: 10px; 
@@ -161,7 +162,7 @@
             transform: translateX(-50%) translateY(-280px) scale(1.15);
             z-index: 15;
         }
-        /* 下部の案内テキスト（位置をさらに下に下げて配置） */
+        /* 下部の案内テキスト */
         .hint {
             position: absolute;
             bottom: -90px; 
@@ -221,14 +222,12 @@
         const wrapper = document.getElementById('envelopeWrapper');
         const hint = document.getElementById('hintText');
 
-        // プログラム内部で直接「シャララン✨」という音を合成して再生する関数（ブラウザ制限を回避）
+        // 電子音をリアルタイム合成して鳴らす関数
         function playChimeSound() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 const ctx = new AudioContext();
-                
                 const now = ctx.currentTime;
-                // 4つの高音をずらして鳴らすことで、美しいチャイム音を表現
                 const notes = [523.25, 659.25, 783.99, 1046.50]; 
                 
                 notes.forEach((freq, index) => {
@@ -238,7 +237,6 @@
                     osc.type = 'sine';
                     osc.frequency.value = freq;
                     
-                    // 音の立ち上がりと消え方の調整
                     const startTime = now + (index * 0.08);
                     gain.gain.setValueAtTime(0, startTime);
                     gain.gain.linearRampToValueAtTime(0.15, startTime + 0.02);
@@ -255,7 +253,10 @@
             }
         }
 
-        wrapper.addEventListener('click', (e) => {
+        // スマホとPCの両方で確実に反応するイベント設定
+        const clickEvent = ('ontouchstart' in window) ? 'touchstart' : 'click';
+        wrapper.addEventListener(clickEvent, (e) => {
+            e.preventDefault();
             wrapper.classList.toggle('open');
             
             if(wrapper.classList.contains('open')) {
@@ -263,10 +264,7 @@
                 hint.style.animation = "none";
                 hint.style.color = "#fff";
                 
-                // 音を鳴らす
                 playChimeSound();
-
-                // キラキラ粒子を生成
                 createSparkles(60);
             } else {
                 hint.textContent = "封筒の刻印をタップしてチケットを授かる";
@@ -296,3 +294,4 @@
                 
                 const mx = Math.cos(angle) * distance1;
                 const my = Math.sin(angle) * distance1;
+                const tx = Math.cos(angle) * distance2;

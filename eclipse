@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eclipse - 特別記念チケット</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #06040a;
+            background-image: radial-gradient(circle at center, #150f24 0%, #06040a 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Georgia', serif;
+        }
+        /* 封筒全体のコンテナ（位置を少し下に調整して飛び出すスペースを確保） */
+        .envelope-wrapper {
+            position: relative;
+            width: 360px;
+            height: 250px;
+            cursor: pointer;
+            perspective: 1200px;
+            transition: transform 0.3s ease;
+            margin-top: 150px; /* 上に飛び出すための余白 */
+        }
+        .envelope-wrapper:hover {
+            transform: translateY(-8px);
+        }
+        /* 封筒の本体 */
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #140e21;
+            border: 2px solid #bfa15f; 
+            border-radius: 4px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            z-index: 2;
+            overflow: hidden;
+        }
+        .envelope::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, transparent 40%, rgba(191, 161, 95, 0.05) 70%);
+            border: 1px dashed rgba(191, 161, 95, 0.1);
+            animation: rotateMagic 20s linear infinite;
+        }
+        @keyframes rotateMagic {
+            100% { transform: rotate(360deg); }
+        }
+        /* 封筒のフタ */
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 180px solid transparent;
+            border-right: 180px solid transparent;
+            border-top: 130px solid #1c142e;
+            transform-origin: top;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 5;
+            filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
+        }
+        .flap::after {
+            content: '';
+            position: absolute;
+            top: -130px;
+            left: -180px;
+            width: 0;
+            height: 0;
+            border-left: 180px solid transparent;
+            border-right: 180px solid transparent;
+            border-top: 126px solid #140e21;
+        }
+        /* 前面ポケット */
+        .pocket {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 180px solid transparent;
+            border-right: 180px solid transparent;
+            border-bottom: 140px solid #181129;
+            z-index: 4;
+            filter: drop-shadow(0 -2px 5px rgba(0,0,0,0.3));
+        }
+        /* シーリングスタンプ */
+        .stamp {
+            position: absolute;
+            top: 110px;
+            left: 155px;
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, #a62424 0%, #731313 100%);
+            border-radius: 50%;
+            z-index: 6;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.2);
+            transition: opacity 0.3s ease, transform 0.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .stamp::after {
+            content: '☀️';
+            font-size: 20px;
+            filter: grayscale(1) brightness(0.5);
+            opacity: 0.6;
+        }
+        /* チケット画像の位置調整（画像自体の白い余白を考慮して、封筒の内部へ隠す） */
+        .ticket {
+            position: absolute;
+            top: -50px; /* スタート位置を上に微調整 */
+            left: 50%;
+            transform: translateX(-50%) translateY(0) scale(0.6); /* 初期サイズを封筒に収まるよう縮小 */
+            width: 320px;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1;
+        }
+        /* 【開いた状態：上に向かってスッと飛び出すエフェクト】 */
+        .envelope-wrapper.open .flap {
+            transform: rotateX(180deg);
+            z-index: 1;
+        }
+        .envelope-wrapper.open .stamp {
+            transform: translateY(-60px) rotate(20deg);
+            opacity: 0;
+        }
+        .envelope-wrapper.open .ticket {
+            /* マイナスの方向に大きく移動させ、画面中央で拡大表示させます */
+            transform: translateX(-50%) translateY(-380px) scale(1.3);
+            z-index: 10;
+        }
+        /* 下部の案内テキスト */
+        .hint {
+            position: absolute;
+            bottom: -60px;
+            width: 100%;
+            text-align: center;
+            color: #bfa15f;
+            font-size: 13px;
+            letter-spacing: 0.15em;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="envelope-wrapper" id="envelopeWrapper">
+        <div class="flap"></div>
+        <div class="stamp"></div>
+        <div class="envelope"></div>
+        <div class="pocket"></div>
+        
+        <img src="ticket.jpg" alt="Eclipse 特別記念チケット" class="ticket">
+        
+        <div class="hint" id="hintText">封筒の刻印をタップしてチケットを授かる</div>
+    </div>
+
+    <script>
+        const wrapper = document.getElementById('envelopeWrapper');
+        const hint = document.getElementById('hintText');
+
+        wrapper.addEventListener('click', () => {
+            wrapper.classList.toggle('open');
+            if(wrapper.classList.contains('open')) {
+                hint.textContent = "旅人よ、世界の再生を見届けてくれてありがとう";
+                hint.style.animation = "none";
+                hint.style.color = "#fff";
+            } else {
+                hint.textContent = "封筒の刻印をタップしてチケットを授かる";
+                hint.style.animation = "pulse 2s infinite";
+                hint.style.color = "#bfa15f";
+            }
+        });
+    </script>
+</body>
+</html>
